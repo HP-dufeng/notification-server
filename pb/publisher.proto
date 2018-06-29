@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+service Publisher {
+    rpc Publish(PublishRequest) returns (PublishReply) {}
+}
+
+message PublishRequest {
+    string notificationName = 1;
+    string message = 2;
+}
+
+message PublishReply {
+
+}
