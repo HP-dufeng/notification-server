@@ -1,6 +1,7 @@
 package notification
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/pborman/uuid"
@@ -22,7 +23,11 @@ type Notification struct {
 // Repository provides access a notification store.
 type Repository interface {
 	Store(notification *Notification) error
+	Find(id ID) (*Notification, error)
 }
+
+// ErrUnknown is used when a notification could not be found.
+var ErrUnknown = errors.New("unknown notification")
 
 // NextNotificationID generates a new notification ID.
 func NextNotificationID() ID {
