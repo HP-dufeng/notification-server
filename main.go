@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/fengdu/notification-server/publisher"
+	"github.com/fengdu/notification-server/publishing"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -38,19 +38,19 @@ func main() {
 
 	fieldKeys := []string{"method"}
 
-	var ps publisher.Service
-	ps = publisher.NewService()
-	ps = publisher.NewLoggingService(log.With(logger, "component", "publisher"), ps)
-	ps = publisher.NewInstrumentingService(
+	var ps publishing.Service
+	ps = publishing.NewService()
+	ps = publishing.NewLoggingService(log.With(logger, "component", "publishing"), ps)
+	ps = publishing.NewInstrumentingService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "api",
-			Subsystem: "publisher_service",
+			Subsystem: "publishing_service",
 			Name:      "request_count",
 			Help:      "Number of requests received.",
 		}, fieldKeys),
 		kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
 			Namespace: "api",
-			Subsystem: "publisher_service",
+			Subsystem: "publishing_service",
 			Name:      "request_latency_microseconds",
 			Help:      "Total duration of requests in microseconds.",
 		}, fieldKeys),
@@ -61,7 +61,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/publish", publisher.MakeHandler(ps, httpLogger))
+	mux.Handle("/publish", publishing.MakeHandler(ps, httpLogger))
 
 	http.Handle("/", accessControl(mux))
 	http.Handle("/metrics", promhttp.Handler())

@@ -1,4 +1,4 @@
-package publisher
+package publishing
 
 // NotificationData used to store data for a notification.
 type NotificationData struct {
