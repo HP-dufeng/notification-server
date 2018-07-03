@@ -10,27 +10,27 @@ import (
 // ID uniquely identifies a particular notification.
 type ID string
 
-// Notification is the central class in the domain model.
-type Notification struct {
+// NotificationInfo is the central class in the domain model.
+type NotificationInfo struct {
 	ID               ID
 	NotificationName string
 	Severity         Severity
-	UserIds          []int64
-	ExcludedUserIds  []int64
-	Data             string
+	// UserIds          []int64
+	// ExcludedUserIds  []int64
+	Data string
 }
 
 // Repository provides access a notification store.
 type Repository interface {
-	Store(notification *Notification) error
-	Find(id ID) (*Notification, error)
+	Insert(notification *NotificationInfo) error
+	Find(id ID) (*NotificationInfo, error)
 }
 
 // ErrUnknown is used when a notification could not be found.
 var ErrUnknown = errors.New("unknown notification")
 
-// NextNotificationID generates a new notification ID.
-func NextNotificationID() ID {
+// NextID generates a new notification ID.
+func NextID() ID {
 	return ID(strings.Split(strings.ToUpper(uuid.New()), "-")[0])
 }
 
