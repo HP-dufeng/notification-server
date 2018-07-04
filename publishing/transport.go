@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/gorilla/mux"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -48,7 +49,7 @@ func decodePublishRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return publishRequest{
 		notificationName: body.NotificationName,
 		message:          body.Message,
-		severity:         ParseSeverity(body.Severity),
+		severity:         notifications.ParseSeverity(body.Severity),
 		userIds:          body.UserIds,
 		excludedUserIds:  body.ExcludedUserIds,
 	}, nil

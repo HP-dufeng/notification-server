@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/go-kit/kit/log"
 )
 
@@ -17,7 +18,7 @@ func NewLoggingService(logger log.Logger, s Service) Service {
 	return &loggingService{logger, s}
 }
 
-func (s *loggingService) Publish(notificationName string, message string, severity NotificationSeverity, userIds []int64, excludedUserIds []int64) (err error) {
+func (s *loggingService) Publish(notificationName string, message string, severity notifications.Severity, userIds []int64, excludedUserIds []int64) (err error) {
 	defer func(begin time.Time) {
 		s.logger.Log(
 			"method", "publish",

@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/fengdu/notification-server/core/notifications"
+	"github.com/fengdu/notification-server/inmem"
 	"github.com/fengdu/notification-server/publishing"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -36,10 +38,27 @@ func main() {
 	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
+	var (
+		notificationInfoRep     = inmem.NewNotificationInfoRepository()
+		userNotificationInfoRep = inmem.NewUserNotificationInfoRepository()
+		subscriptionInfoRep     = inmem.NewSubscriptionInfoRepository()
+	)
+
+	var (
+		repositories = notifications.Repositories{
+			NotificationInfoRepository:     notificationInfoRep,
+			UserNotificationInfoRepository: userNotificationInfoRep,
+			SubscriptionInfoRepository:     subscriptionInfoRep,
+		}
+		notificationStore = notifications.NewNotificationStore(repositories)
+		realtimeNotifiter = notifications.NewNullRealTimeNotifier()
+		publisher         = notifications.NewPublisher(notificationStore, realtimeNotifiter)
+	)
+
 	fieldKeys := []string{"method"}
 
 	var ps publishing.Service
-	ps = publishing.NewService()
+	ps = publishing.NewService(publisher)
 	ps = publishing.NewLoggingService(log.With(logger, "component", "publishing"), ps)
 	ps = publishing.NewInstrumentingService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{

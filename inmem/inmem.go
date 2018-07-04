@@ -3,73 +3,73 @@ package inmem
 import (
 	"sync"
 
-	"github.com/fengdu/notification-server/core/notification"
+	"github.com/fengdu/notification-server/core/notifications"
 )
 
 type notificationRepository struct {
 	mtx           sync.RWMutex
-	notifications map[notification.ID]*notification.Notification
+	notifications map[notifications.ID]*notifications.NotificationInfo
 }
 
-func (r *notificationRepository) Store(n *notification.Notification) error {
+func (r *notificationRepository) Insert(n *notifications.NotificationInfo) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.notifications[n.ID] = n
 	return nil
 }
 
-func (r *notificationRepository) Find(id notification.ID) (*notification.Notification, error) {
+func (r *notificationRepository) Find(id notifications.ID) (*notifications.NotificationInfo, error) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if val, ok := r.notifications[id]; ok {
 		return val, nil
 	}
 
-	return nil, notification.ErrUnknown
+	return nil, notifications.ErrUnknown
 }
 
-// NewNotificationRepository returns a new instance of a in-memory notification repository.
-func NewNotificationRepository() notification.Repository {
+// NewNotificationInfoRepository returns a new instance of a in-memory notification repository.
+func NewNotificationInfoRepository() notifications.NotificationInfoRepository {
 	return &notificationRepository{
-		notifications: make(map[notification.ID]*notification.Notification),
+		notifications: make(map[notifications.ID]*notifications.NotificationInfo),
 	}
 }
 
 type userNotificationRepository struct {
 	mtx           sync.RWMutex
-	notifications map[notification.ID]*notification.UserNotificationInfo
+	notifications map[notifications.ID]*notifications.UserNotificationInfo
 }
 
-func (r *userNotificationRepository) Store(n *notification.UserNotificationInfo) error {
+func (r *userNotificationRepository) Insert(n *notifications.UserNotificationInfo) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.notifications[n.ID] = n
 	return nil
 }
 
-// NewUserNotificationRepository returns a new instance of a in-memory notification repository.
-func NewUserNotificationRepository() notification.UserNotificationRepository {
+// NewUserNotificationInfoRepository returns a new instance of a in-memory notification repository.
+func NewUserNotificationInfoRepository() notifications.UserNotificationInfoRepository {
 	return &userNotificationRepository{
-		notifications: make(map[notification.ID]*notification.UserNotificationInfo),
+		notifications: make(map[notifications.ID]*notifications.UserNotificationInfo),
 	}
 }
 
 type subscriptionRepsoitory struct {
 	mtx           sync.RWMutex
-	subscriptions map[notification.ID]*notification.SubscriptionInfo
+	subscriptions map[notifications.ID]*notifications.SubscriptionInfo
 }
 
-func (r *subscriptionRepsoitory) Insert(s *notification.SubscriptionInfo) error {
+func (r *subscriptionRepsoitory) Insert(s *notifications.SubscriptionInfo) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.subscriptions[s.ID] = s
 	return nil
 }
 
-func (r *subscriptionRepsoitory) GetAll(notificationName string) []notification.SubscriptionInfo {
+func (r *subscriptionRepsoitory) GetAll(notificationName string) []notifications.SubscriptionInfo {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
-	subscriptions := make([]notification.SubscriptionInfo, 0)
+	subscriptions := make([]notifications.SubscriptionInfo, 0)
 	for _, v := range r.subscriptions {
 		if v.NotificationName == notificationName {
 			subscriptions = append(subscriptions, *v)
@@ -79,9 +79,9 @@ func (r *subscriptionRepsoitory) GetAll(notificationName string) []notification.
 	return subscriptions
 }
 
-// NewSubscriptionRepository returns a new instance of a in-memory notification repository.
-func NewSubscriptionRepository() notification.SubscriptionRepository {
+// NewSubscriptionInfoRepository returns a new instance of a in-memory notification repository.
+func NewSubscriptionInfoRepository() notifications.SubscriptionInfoRepository {
 	return &subscriptionRepsoitory{
-		subscriptions: make(map[notification.ID]*notification.SubscriptionInfo),
+		subscriptions: make(map[notifications.ID]*notifications.SubscriptionInfo),
 	}
 }

@@ -1,4 +1,4 @@
-package notification
+package notifications
 
 import "time"
 
@@ -22,8 +22,8 @@ func NewUserNotificationInfo(userID int64, notificationID ID) *UserNotificationI
 	}
 }
 
-// UserNotificationRepository provides access a user_notification store.
-type UserNotificationRepository interface {
+// UserNotificationInfoRepository provides access a user_notification store.
+type UserNotificationInfoRepository interface {
 	Insert(userNotificationInfo *UserNotificationInfo) error
 }
 

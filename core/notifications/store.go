@@ -1,4 +1,4 @@
-package notification
+package notifications
 
 // Store used to store (persist) notifications.
 type Store interface {
@@ -9,34 +9,34 @@ type Store interface {
 }
 
 type store struct {
-	notificationRepository     Repository
-	userNotificationRepository UserNotificationRepository
-	subscriptionRespository    SubscriptionRepository
+	notificationInfoRepository     NotificationInfoRepository
+	userNotificationInfoRepository UserNotificationInfoRepository
+	subscriptionInfoRespository    SubscriptionInfoRepository
 }
 
 func (s *store) InsertNotification(n *NotificationInfo) error {
-	return s.notificationRepository.Insert(n)
+	return s.notificationInfoRepository.Insert(n)
 }
 
 func (s *store) InsertUserNotification(u *UserNotificationInfo) error {
-	err := s.userNotificationRepository.Insert(u)
+	err := s.userNotificationInfoRepository.Insert(u)
 	return err
 }
 
 func (s *store) GetNotification(notificationID ID) (*NotificationInfo, error) {
-	return s.notificationRepository.Find(notificationID)
+	return s.notificationInfoRepository.Find(notificationID)
 
 }
 
 func (s *store) GetSubscriptions(notificationName string) []SubscriptionInfo {
-	return s.subscriptionRespository.GetAll(notificationName)
+	return s.subscriptionInfoRespository.GetAll(notificationName)
 }
 
 // NewNotificationStore returns a new instance of a notification store.
-func NewNotificationStore(notificationRepository Repository, userNotificationRepository UserNotificationRepository, subscriptionRepository SubscriptionRepository) Store {
+func NewNotificationStore(repositories Repositories) Store {
 	return &store{
-		notificationRepository,
-		userNotificationRepository,
-		subscriptionRepository,
+		repositories.NotificationInfoRepository,
+		repositories.UserNotificationInfoRepository,
+		repositories.SubscriptionInfoRepository,
 	}
 }

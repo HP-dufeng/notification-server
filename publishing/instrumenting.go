@@ -3,6 +3,7 @@ package publishing
 import (
 	"time"
 
+	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/go-kit/kit/metrics"
 )
 
@@ -21,7 +22,7 @@ func NewInstrumentingService(counter metrics.Counter, latency metrics.Histogram,
 	}
 }
 
-func (s *instrumentingService) Publish(notificationName string, message string, severity NotificationSeverity, userIds []int64, excludedUserIds []int64) error {
+func (s *instrumentingService) Publish(notificationName string, message string, severity notifications.Severity, userIds []int64, excludedUserIds []int64) error {
 	defer func(begin time.Time) {
 		s.requestCount.With("method", "publish").Add(1)
 		s.requestLatency.With("method", "publish").Observe(time.Since(begin).Seconds())

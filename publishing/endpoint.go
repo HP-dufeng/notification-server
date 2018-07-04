@@ -3,13 +3,14 @@ package publishing
 import (
 	"context"
 
+	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/go-kit/kit/endpoint"
 )
 
 type publishRequest struct {
 	notificationName string
 	message          string
-	severity         NotificationSeverity
+	severity         notifications.Severity
 	userIds          []int64
 	excludedUserIds  []int64
 }

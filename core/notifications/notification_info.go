@@ -1,38 +1,25 @@
-package notification
+package notifications
 
 import (
 	"errors"
-	"strings"
-
-	"github.com/pborman/uuid"
 )
-
-// ID uniquely identifies a particular notification.
-type ID string
 
 // NotificationInfo is the central class in the domain model.
 type NotificationInfo struct {
 	ID               ID
 	NotificationName string
 	Severity         Severity
-	// UserIds          []int64
-	// ExcludedUserIds  []int64
-	Data string
+	Data             string
 }
 
-// Repository provides access a notification store.
-type Repository interface {
+// NotificationInfoRepository provides access a notification store.
+type NotificationInfoRepository interface {
 	Insert(notification *NotificationInfo) error
 	Find(id ID) (*NotificationInfo, error)
 }
 
 // ErrUnknown is used when a notification could not be found.
 var ErrUnknown = errors.New("unknown notification")
-
-// NextID generates a new notification ID.
-func NextID() ID {
-	return ID(strings.Split(strings.ToUpper(uuid.New()), "-")[0])
-}
 
 // Severity describes severity of notification.
 type Severity int8
