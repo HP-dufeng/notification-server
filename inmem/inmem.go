@@ -48,7 +48,7 @@ func (r *userNotificationRepository) Insert(n *notifications.UserNotificationInf
 }
 
 func (r *userNotificationRepository) FindAll() []*notifications.UserNotificationInfo {
-	s := make([]*notifications.UserNotificationInfo, len(r.data))
+	s := make([]*notifications.UserNotificationInfo, 0, len(r.data))
 	for _, v := range r.data {
 		s = append(s, v)
 	}

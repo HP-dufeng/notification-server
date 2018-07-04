@@ -18,7 +18,7 @@ func NewUserNotificationManager(s Store) UserNotificationManager {
 
 func (u *userNotificationManager) GetUserNotifications(userID int64) []*UserNotificationDto {
 	userNotifications := u.store.GetUserNotifications(userID)
-	dtos := make([]*UserNotificationDto, len(userNotifications))
+	dtos := make([]*UserNotificationDto, 0, len(userNotifications))
 	for _, v := range userNotifications {
 		if n, err := u.store.GetNotification(v.NotificationID); err == nil {
 			dtos = append(dtos, &UserNotificationDto{
