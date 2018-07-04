@@ -2,6 +2,15 @@ package notifications
 
 import "time"
 
+// UserNotificationDto represents a notification sent to a user.
+type UserNotificationDto struct {
+	UserID                int64
+	UserNotificationState UserNotificationState
+	NotificationName      string
+	Severity              Severity
+	Data                  string
+}
+
 // UserNotificationInfo is the central class in the domain model.
 type UserNotificationInfo struct {
 	ID             ID
@@ -25,6 +34,7 @@ func NewUserNotificationInfo(userID int64, notificationID ID) *UserNotificationI
 // UserNotificationInfoRepository provides access a user_notification store.
 type UserNotificationInfoRepository interface {
 	Insert(userNotificationInfo *UserNotificationInfo) error
+	FindAll() []*UserNotificationInfo
 }
 
 // UserNotificationState describes state of notification.

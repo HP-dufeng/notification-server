@@ -10,6 +10,7 @@ import (
 
 	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/fengdu/notification-server/inmem"
+	"github.com/fengdu/notification-server/managing"
 	"github.com/fengdu/notification-server/publishing"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -53,6 +54,7 @@ func main() {
 		notificationStore = notifications.NewNotificationStore(repositories)
 		realtimeNotifiter = notifications.NewNullRealTimeNotifier()
 		publisher         = notifications.NewPublisher(notificationStore, realtimeNotifiter)
+		manager           = notifications.NewUserNotificationManager(notificationStore)
 	)
 
 	fieldKeys := []string{"method"}
@@ -76,11 +78,15 @@ func main() {
 		ps,
 	)
 
+	var ms managing.Service
+	ms = managing.NewService(manager)
+
 	httpLogger := log.With(logger, "component", "http")
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/publish", publishing.MakeHandler(ps, httpLogger))
+	mux.Handle("/publishing/v1/", publishing.MakeHandler(ps, httpLogger))
+	mux.Handle("/managing/v1/", managing.MakeHandler(ms, httpLogger))
 
 	http.Handle("/", accessControl(mux))
 	http.Handle("/metrics", promhttp.Handler())

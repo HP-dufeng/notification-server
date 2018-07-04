@@ -1,11 +1,12 @@
-package publishing
+package managing
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strconv"
 
-	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/gorilla/mux"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -19,39 +20,36 @@ func MakeHandler(s Service, logger kitlog.Logger) http.Handler {
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
-	publishHandler := kithttp.NewServer(
-		makePublishEndpoint(s),
-		decodePublishRequest,
+	getUserNotificationsHandler := kithttp.NewServer(
+		makeGetUserNotificationsEndpoint(s),
+		decodeGetUserNotificationsRequest,
 		encodeResponse,
 		opts...,
 	)
 
 	r := mux.NewRouter()
 
-	r.Handle("/publishing/v1/publish", publishHandler).Methods("POST")
+	r.Handle("/managing/v1/user/{id}", getUserNotificationsHandler).Methods("GET")
 
 	return r
 }
 
-func decodePublishRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var body struct {
-		NotificationName string  `json:"notificationName"`
-		Message          string  `json:"message"`
-		Severity         string  `json:"severity"`
-		UserIds          []int64 `json:"userIds"`
-		ExcludedUserIds  []int64 `json:"excludedUserIds"`
+var errBadRoute = errors.New("bad route")
+
+func decodeGetUserNotificationsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, errBadRoute
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, err
+	userID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return nil, ErrInvalidArgument
 	}
 
-	return publishRequest{
-		notificationName: body.NotificationName,
-		message:          body.Message,
-		severity:         notifications.ParseSeverity(body.Severity),
-		userIds:          body.UserIds,
-		excludedUserIds:  body.ExcludedUserIds,
+	return getUserNotificationsRequest{
+		userID: userID,
 	}, nil
 }
 
@@ -72,8 +70,6 @@ type errorer interface {
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	switch err {
-	// case cargo.ErrUnknown:
-	// 	w.WriteHeader(http.StatusNotFound)
 	case ErrInvalidArgument:
 		w.WriteHeader(http.StatusBadRequest)
 	default:

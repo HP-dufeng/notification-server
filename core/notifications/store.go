@@ -5,7 +5,23 @@ type Store interface {
 	InsertNotification(n *NotificationInfo) error
 	InsertUserNotification(userNotificationInfo *UserNotificationInfo) error
 	GetNotification(notificationID ID) (*NotificationInfo, error)
+	GetUserNotifications(userID int64) []*UserNotificationInfo
 	GetSubscriptions(notificationName string) []SubscriptionInfo
+}
+
+type Repositories struct {
+	NotificationInfoRepository
+	UserNotificationInfoRepository
+	SubscriptionInfoRepository
+}
+
+// NewNotificationStore returns a new instance of a notification store.
+func NewNotificationStore(repositories Repositories) Store {
+	return &store{
+		repositories.NotificationInfoRepository,
+		repositories.UserNotificationInfoRepository,
+		repositories.SubscriptionInfoRepository,
+	}
 }
 
 type store struct {
@@ -28,15 +44,17 @@ func (s *store) GetNotification(notificationID ID) (*NotificationInfo, error) {
 
 }
 
-func (s *store) GetSubscriptions(notificationName string) []SubscriptionInfo {
-	return s.subscriptionInfoRespository.GetAll(notificationName)
+func (s *store) GetUserNotifications(userID int64) []*UserNotificationInfo {
+	userNotifications := make([]*UserNotificationInfo, 0)
+	for _, v := range s.userNotificationInfoRepository.FindAll() {
+		if v.UserID == userID {
+			userNotifications = append(userNotifications, v)
+		}
+	}
+
+	return userNotifications
 }
 
-// NewNotificationStore returns a new instance of a notification store.
-func NewNotificationStore(repositories Repositories) Store {
-	return &store{
-		repositories.NotificationInfoRepository,
-		repositories.UserNotificationInfoRepository,
-		repositories.SubscriptionInfoRepository,
-	}
+func (s *store) GetSubscriptions(notificationName string) []SubscriptionInfo {
+	return s.subscriptionInfoRespository.GetAll(notificationName)
 }
