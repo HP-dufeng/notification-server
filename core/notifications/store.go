@@ -45,7 +45,7 @@ func (s *store) GetNotification(notificationID ID) (*NotificationInfo, error) {
 }
 
 func (s *store) GetUserNotifications(userID int64) []*UserNotificationInfo {
-	userNotifications := make([]*UserNotificationInfo, 0)
+	userNotifications := []*UserNotificationInfo{}
 	for _, v := range s.userNotificationInfoRepository.FindAll() {
 		if v.UserID == userID {
 			userNotifications = append(userNotifications, v)

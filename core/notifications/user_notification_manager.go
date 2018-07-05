@@ -23,9 +23,9 @@ func (u *userNotificationManager) GetUserNotifications(userID int64) []*UserNoti
 		if n, err := u.store.GetNotification(v.NotificationID); err == nil {
 			dtos = append(dtos, &UserNotificationDto{
 				UserID:                v.UserID,
-				UserNotificationState: v.State,
+				UserNotificationState: v.State.String(),
 				NotificationName:      n.NotificationName,
-				Severity:              n.Severity,
+				Severity:              n.Severity.String(),
 				Data:                  n.Data,
 			})
 		}

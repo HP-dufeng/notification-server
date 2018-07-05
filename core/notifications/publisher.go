@@ -64,14 +64,14 @@ func (d *publisher) getUsers(notificationName string, userIds []int64, excludedU
 }
 
 func (d *publisher) saveUserNotifications(userIds []int64, notification *NotificationInfo) []*UserNotificationDto {
-	dtos := make([]*UserNotificationDto, len(userIds))
+	dtos := make([]*UserNotificationDto, 0, len(userIds))
 	for _, v := range userIds {
 		d.store.InsertUserNotification(NewUserNotificationInfo(v, notification.ID))
 		dtos = append(dtos, &UserNotificationDto{
 			UserID:                v,
-			UserNotificationState: Unread,
+			UserNotificationState: Unread.String(),
 			NotificationName:      notification.NotificationName,
-			Severity:              notification.Severity,
+			Severity:              notification.Severity.String(),
 			Data:                  notification.Data,
 		})
 	}

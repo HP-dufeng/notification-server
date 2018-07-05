@@ -5,9 +5,9 @@ import "time"
 // UserNotificationDto represents a notification sent to a user.
 type UserNotificationDto struct {
 	UserID                int64
-	UserNotificationState UserNotificationState
+	UserNotificationState string
 	NotificationName      string
-	Severity              Severity
+	Severity              string
 	Data                  string
 }
 
