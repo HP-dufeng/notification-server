@@ -13,7 +13,7 @@ The implementation is based on the [Domain Driven Design](http://www.amazon.com/
 The project consists of multiple folders.
 - __core__ - contains domain packages that contain some intricate business-logic.
 - __application__ - contains micro services.
--__inmem__ - contains in-memory implementations for the repositories found in the domain packages.
+- __inmem__ - contains in-memory implementations for the repositories found in the domain packages.
 - __cmd__ - contains commands that used to start services.
 
 The application folder consists of three micro services. 
