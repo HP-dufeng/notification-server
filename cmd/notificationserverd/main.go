@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/fengdu/notification-server/application/managing"
+	"github.com/fengdu/notification-server/application/publishing"
 	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/fengdu/notification-server/inmem"
-	"github.com/fengdu/notification-server/managing"
-	"github.com/fengdu/notification-server/publishing"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

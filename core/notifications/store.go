@@ -9,6 +9,7 @@ type Store interface {
 	GetSubscriptions(notificationName string) []SubscriptionInfo
 }
 
+// Repositories reference necessary repository dependencies.
 type Repositories struct {
 	NotificationInfoRepository
 	UserNotificationInfoRepository
