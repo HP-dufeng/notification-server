@@ -12,6 +12,7 @@ import (
 	"github.com/fengdu/notification-server/application/publishing"
 	"github.com/fengdu/notification-server/core/notifications"
 	"github.com/fengdu/notification-server/inmem"
+	"github.com/gorilla/websocket"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -51,11 +52,37 @@ func main() {
 			UserNotificationInfoRepository: userNotificationInfoRep,
 			SubscriptionInfoRepository:     subscriptionInfoRep,
 		}
-		notificationStore = notifications.NewNotificationStore(repositories)
-		realtimeNotifiter = notifications.NewNullRealTimeNotifier()
-		publisher         = notifications.NewPublisher(notificationStore, realtimeNotifiter)
-		manager           = notifications.NewUserNotificationManager(notificationStore)
+		notificationStore   = notifications.NewNotificationStore(repositories)
+		onlineClientManager = notifications.NewOnlineClientManager()
+		realtimeNotifiter   = notifications.NewWebSocketRealTimeNotifier(onlineClientManager)
+		publisher           = notifications.NewPublisher(notificationStore, realtimeNotifiter)
+		manager             = notifications.NewUserNotificationManager(notificationStore)
 	)
+
+	hub := notifications.NewHub(onlineClientManager)
+
+	go hub.Start()
+
+	var upgrader = websocket.Upgrader{
+		CheckOrigin:     func(r *http.Request) bool { return true },
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		client := notifications.NewOnlineClient(conn, 1)
+		hub.AddClient <- client
+
+		go client.Sending()
+		go client.Closing(hub.RemoveClient)
+
+	})
 
 	fieldKeys := []string{"method"}
 
